@@ -1,8 +1,10 @@
 
-import ethers from "ethers"
-import {contractAbi} from "../constant/contractAbi.json"
+import {ethers} from "ethers"
+import contractAbi from "../constant/contractAbi.json"
 import toast from "react-hot-toast"
-export const connectWallet=async ()=>{
+import axios from "axios"
+
+ const connectWallet=async ()=>{
     try{
         if(!window.ethereum){
             throw new Error("please install metamask")
@@ -14,18 +16,35 @@ export const connectWallet=async ()=>{
         console.log(accounts[0])
     
         const selectedAccounts=accounts[0]
+        console.log(selectedAccounts)
     
-    
-        const provider=ethers.BrowserProvider(window.ethereum)
+        const provider= new ethers.BrowserProvider(window.ethereum)
     
         const signer=await provider.getSigner()
+        console.log(signer)
+
+        const message="Welcome to Crypto vault!"
+
+        const signature=await signer.signMessage(message)
+        const dataSignature={
+            signature
+        }
+        console.log(signature)  //working
+        const url=`http://localhost:3000/api/authentication?address=${selectedAccounts}`
+        const res=await axios.post(url,dataSignature)
+        console.log(res.data)
+
+        
     
         const contractAddress=import.meta.env.VITE_CONTRACT_ADDRESS
-        console.log(contractAddress)
+        console.log(contractAddress)  //correct
     
-        const contractInstance=new ethers.Contract(contractAddress,contractAbi,signer)
-    
-        return (contractInstance,selectedAccounts)
+        const contractInstance=new ethers.Contract(contractAddress,contractAbi,signer)  
+      console.log(contractInstance)  //correct
+      console.log(contractAbi)
+
+      console.log(selectedAccounts) //correct
+        return {contractInstance,selectedAccounts}
     }
     catch(error){
         toast.error("metamask connection failed")
@@ -33,4 +52,7 @@ export const connectWallet=async ()=>{
     }
 
 
+
+
 }
+export default connectWallet

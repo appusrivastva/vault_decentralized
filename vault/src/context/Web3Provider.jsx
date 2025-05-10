@@ -6,11 +6,16 @@ export default function Web3Provider({children}) {
               contractIntance:null,
               selectedAccount:null
     })
+    
     const updateWeb3State=(newState)=>{
-        setWeb3State((prevState=({
-            ...newState,...prevState
-        })))
+        setWeb3State((prevState)=>(
+            {
+            ...newState,
+            ...prevState
+        }
+        ))
     }
+    
   return (
      <web3Context.Provider value={{web3State,updateWeb3State}}>
         {children}

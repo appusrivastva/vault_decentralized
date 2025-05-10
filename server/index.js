@@ -1,9 +1,34 @@
 const  express=require('express')
-require("dotenv").config()
+
+const authRoute=require("./routes/authRoute")
+const cors = require("cors");
+const {PORT,MONGO_DB_URL}=require("./config/configServer")
+const {connectDB}=require("./db/db")
 
 const app=express()
-const PORT=process.env.PORT || 8080
-app.listen(PORT,()=>{
-    console.log(`server is listening on port ${PORT}`)
+
+app.use(cors())
+app.use(express.json());
+
+app.use("/api",authRoute)
+app.get("/",(req,res)=>{
+    res.send("home route")
+})
+
+async  function serverStart(){
+    try{
+           await connectDB(MONGO_DB_URL)
+           console.log("Database is connected")
+    
+    app.listen(PORT,()=>{
+    console.log(`server is listening on port ${PORT}  `)
 
 })
+    }
+    catch(err){
+        console.log(err)
+    }
+
+}
+
+serverStart()
